@@ -63,7 +63,7 @@ namespace mjx {
     }
 
     inline void _Print_version() noexcept {
-        rtlog(L"ULPCL version %s compiled on %s", _UNICODE_ULPCL_VERSION, _UNICODE_ULPCL_COMPILATION_DATE);
+        rtlog(L"ULPCL version %s compiled on %s", _WIDEN(_ULPCL_VERSION), _WIDEN(_ULPCL_COMPILATION_DATE));
     }
 
     inline bool _Should_invoke_entry_point(int _Count, wchar_t** _Args) noexcept {
