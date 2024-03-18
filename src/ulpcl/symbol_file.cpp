@@ -16,51 +16,59 @@
 #include <type_traits>
 
 namespace mjx {
-    void _Date_serializer::_Serialize_day(byte_t* const _Buf, const uint8_t _Day) noexcept {
-        // convert _Day into 'dd' day format, prepend zero if it doesn't consist of two digits
-        if (_Day < 10) { // prepend zero
-            _Buf[0] = '0';
-            _Buf[1] = _Day + '0';
-        } else {
-            _Buf[0] = (_Day / 10) + '0';
-            _Buf[1] = (_Day % 10) + '0';
-        }
+    _Local_date _Get_local_date() noexcept {
+        SYSTEMTIME _Time;
+        ::GetLocalTime(&_Time);
+        return _Local_date{
+            static_cast<uint8_t>(_Time.wDay), static_cast<uint8_t>(_Time.wMonth), _Time.wYear};
     }
 
-    void _Date_serializer::_Serialize_month(byte_t* const _Buf, const uint8_t _Month) noexcept {
-        // convert _Month into 'mm' month format, prepend zero if it doesn't consist of two digits
-        if (_Month < 10) { // prepend zero
+    void _Write_day_or_month_to_buffer(byte_t* const _Buf, const uint8_t _Day_or_month) noexcept {
+        // write _Day_or_month to _Buf and end with a dot, assumes that _Buf will fit three characters
+        if (_Day_or_month < 10) { // write one digit, prepend with a zero
             _Buf[0] = '0';
-            _Buf[1] = _Month + '0';
-        } else {
-            _Buf[0] = (_Month / 10) + '0';
-            _Buf[1] = (_Month % 10) + '0';
+            _Buf[1] = _Day_or_month + '0';
+        } else { // write two digits
+            _Buf[0] = (_Day_or_month / 10) + '0';
+            _Buf[1] = (_Day_or_month % 10) + '0';
         }
+
+        _Buf[2] = '.'; // write a dot that will connect the two date components
     }
 
-    void _Date_serializer::_Serialize_year(byte_t* const _Buf, const uint16_t _Year) noexcept {
-        // convert _Year into 'yyyy' year format, prepend zeros if it doesn't consist of four digits
-        if (_Year < 10) { // prepend three zeros
+    void _Write_year_to_buffer(byte_t* const _Buf, const uint16_t _Year) noexcept {
+        // write _Year to _Buf, assumes that _Buf will fit four characters
+        if (_Year < 10) { // write one digit, prepend with three zeros
             _Buf[0] = '0';
             _Buf[1] = '0';
             _Buf[2] = '0';
-            _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
-        } else if (_Year < 100) { // prepend two zeros
+            _Buf[3] = static_cast<byte_t>(_Year) + '0';
+        } else if (_Year < 100) { // write two digits, prepend with two zeros
             _Buf[0] = '0';
             _Buf[1] = '0';
             _Buf[2] = static_cast<byte_t>((_Year % 100) / 10) + '0';
             _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
-        } else if (_Year < 1000) { // prepend zero
+        } else if (_Year < 1000) { // write three digits, prepend with a zero
             _Buf[0] = '0';
             _Buf[1] = static_cast<byte_t>((_Year % 1000) / 100) + '0';
             _Buf[2] = static_cast<byte_t>((_Year % 100) / 10) + '0';
             _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
-        } else {
+        } else { // write four digits
             _Buf[0] = static_cast<byte_t>(_Year / 1000) + '0';
             _Buf[1] = static_cast<byte_t>((_Year % 1000) / 100) + '0';
             _Buf[2] = static_cast<byte_t>((_Year % 100) / 10) + '0';
             _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
         }
+    }
+
+    byte_string _Get_current_date() {
+        constexpr size_t _Str_size = 10; // always ten characters ('dd.mm.yyyy')
+        byte_t _Buf[_Str_size + 1] = {'\0'}; // must fit serialized date + null-terminator
+        const _Local_date _Date    = _Get_local_date();
+        _Write_day_or_month_to_buffer(_Buf, _Date._Day);
+        _Write_day_or_month_to_buffer(_Buf + 3, _Date._Month); // skip 'dd.'
+        _Write_year_to_buffer(_Buf + 6, _Date._Year); // skip 'dd.mm.'
+        return byte_string{_Buf, _Str_size};
     }
 
     byte_string _Symbol_serializer::_Serialize_location(const symbol_location _Location) {
@@ -80,24 +88,6 @@ namespace mjx {
     byte_string _Symbol_serializer::_Serialize(const symbol& _Symbol) {
         static constexpr byte_t _Connector[] = {':', ' ', '\0'};
         return _Serialize_location(_Symbol.location) + _Connector + _Serialize_id(_Symbol.id);
-    }
-
-    _Local_date_provider::_Local_date _Local_date_provider::_Query_raw() noexcept {
-        SYSTEMTIME _Time;
-        ::GetLocalTime(&_Time);
-        return _Local_date{
-            static_cast<uint8_t>(_Time.wDay), static_cast<uint8_t>(_Time.wMonth), _Time.wYear};
-    }
-
-    byte_string _Local_date_provider::_Query() {
-        const _Local_date _Date    = _Query_raw();
-        constexpr size_t _Buf_size = 10; // always the same size
-        byte_string _Buf(_Buf_size, '.'); // assign dots to avoid having to insert them manually later
-        byte_t* const _Buf_ptr = _Buf.data();
-        _Date_serializer::_Serialize_day(_Buf_ptr, _Date._Day);
-        _Date_serializer::_Serialize_month(_Buf_ptr + 3, _Date._Month);
-        _Date_serializer::_Serialize_year(_Buf_ptr + 6, _Date._Year);
-        return ::std::move(_Buf);
     }
 
     _Symbol_file::_Symbol_file(const path& _Target, report_counters& _Counters)
@@ -140,11 +130,11 @@ namespace mjx {
             return false;
         }
 
-        static constexpr char _Fmt[] = "// generated by ULPCL %s on %s\n\n";
-        constexpr size_t _Buf_size   = 128;
-        byte_t _Buf[_Buf_size]       = {'\0'}; // should accommodate every possible comment
-        const int _Written           = ::snprintf(reinterpret_cast<char*>(_Buf), // negative value on error
-            _Buf_size, _Fmt, _BYTE_ULPCL_VERSION, _Local_date_provider::_Query().c_str());
+        constexpr char _Fmt[]      = "// generated by ULPCL %s on %s\n\n";
+        constexpr size_t _Buf_size = 128;
+        byte_t _Buf[_Buf_size]     = {'\0'}; // should accommodate every possible comment
+        const int _Written         = ::snprintf(reinterpret_cast<char*>(_Buf), // negative value on error
+            _Buf_size, _Fmt, _ULPCL_VERSION, _Get_current_date().c_str());
         return _Written > 0 ? _Mystream.write(_Buf, static_cast<size_t>(_Written)) : false;
     }
 

@@ -14,16 +14,16 @@
 #include <ulpcl/utils.hpp>
 
 namespace mjx {
-    struct _Date_serializer {
-        // writes serialized day into the buffer
-        static void _Serialize_day(byte_t* const _Buf, const uint8_t _Day) noexcept;
-
-        // writes serialized month into the buffer
-        static void _Serialize_month(byte_t* const _Buf, const uint8_t _Month) noexcept;
-
-        // writes serialized year into the buffer
-        static void _Serialize_year(byte_t* const _Buf, const uint16_t _Year) noexcept;
+    struct _Local_date {
+        uint8_t _Day;
+        uint8_t _Month;
+        uint16_t _Year;
     };
+
+    _Local_date _Get_local_date() noexcept;
+    void _Write_day_or_month_to_buffer(byte_t* const _Buf, const uint8_t _Day_or_month) noexcept;
+    void _Write_year_to_buffer(byte_t* const _Buf, const uint16_t _Year) noexcept;
+    byte_string _Get_current_date();
 
     struct symbol_location {
         uint64_t id    = 0; // location of the symbol ID
@@ -46,26 +46,6 @@ namespace mjx {
         static byte_string _Serialize(const symbol& _Symbol);
     };
 
-    class _Local_date_provider {
-    public:
-        _Local_date_provider()                                       = delete;
-        _Local_date_provider(const _Local_date_provider&)            = delete;
-        _Local_date_provider& operator=(const _Local_date_provider&) = delete;
-
-        // returns the current local date as a string
-        static byte_string _Query();
-
-    private:
-        struct _Local_date {
-            uint8_t _Day;
-            uint8_t _Month;
-            uint16_t _Year;
-        };
-
-        // returns the current local date
-        static _Local_date _Query_raw() noexcept;
-    };
-     
     struct report_counters;
 
     class _Symbol_file {
