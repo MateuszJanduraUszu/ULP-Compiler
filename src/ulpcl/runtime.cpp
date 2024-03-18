@@ -66,11 +66,11 @@ namespace mjx {
 
     unicode_string get_current_time() {
         constexpr size_t _Str_size  = 8; // always eight characters ('hh:mm:ss')
-        wchar_t _Buf[_Str_size + 1] = {'\0'}; // must fit serialized time + null-terminator
-        const _Local_time _Local    = _Get_local_time();
-        _Write_time_component_to_buffer(_Buf, _Local._Hour, true);
-        _Write_time_component_to_buffer(_Buf + 3, _Local._Minute, true); // skip 'hh:'
-        _Write_time_component_to_buffer(_Buf + 6, _Local._Second, false); // skip 'hh:mm:'
+        wchar_t _Buf[_Str_size + 1] = {L'\0'}; // must fit serialized time + null-terminator
+        const _Local_time _Time     = _Get_local_time();
+        _Write_time_component_to_buffer(_Buf, _Time._Hour, true);
+        _Write_time_component_to_buffer(_Buf + 3, _Time._Minute, true); // skip 'hh:'
+        _Write_time_component_to_buffer(_Buf + 6, _Time._Second, false); // skip 'hh:mm:'
         return unicode_string{_Buf, _Str_size};
     }
 } // namespace mjx
