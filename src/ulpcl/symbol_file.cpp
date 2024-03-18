@@ -86,7 +86,7 @@ namespace mjx {
     }
     
     byte_string _Symbol_serializer::_Serialize(const symbol& _Symbol) {
-        static constexpr byte_t _Connector[] = {':', ' ', '\0'};
+        constexpr byte_t _Connector[] = {':', ' ', '\0'};
         return _Serialize_location(_Symbol.location) + _Connector + _Serialize_id(_Symbol.id);
     }
 
