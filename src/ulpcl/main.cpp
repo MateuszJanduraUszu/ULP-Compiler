@@ -58,7 +58,7 @@ namespace mjx {
             L" limited to: 1, 2, 4, 8)\n"
             L"\n"
             L"    --discard-empty (or -d)   discard messages that have no values\n"
-            L"    --symbol-file (or -s)     generates a symbol file for each input file"
+            L"    --symbol-file (or -s)     generate a symbol file for each input file"
         );
     }
 

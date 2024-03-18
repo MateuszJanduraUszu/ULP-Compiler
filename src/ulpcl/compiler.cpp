@@ -24,7 +24,7 @@ namespace mjx {
         vector<message> _Messages;
         _Messages.reserve(_Group.messages.size()); // pre-allocate space for the messages from this group
         for (const message& _Message : _Group.messages) { // get messages from the current group
-            _Messages.push_back(message{ _Namespace + _Message.id, _Message.value });
+            _Messages.push_back(message{_Namespace + _Message.id, _Message.value});
         }
 
         for (const group& _Child_group : _Group.groups) {
@@ -94,8 +94,8 @@ namespace mjx {
             return false;
         }
 
-        constexpr size_t _Signature_length                    = 4;
-        static constexpr byte_t _Signature[_Signature_length] = {'U', 'M', 'C', '\0'};
+        constexpr size_t _Signature_length             = 4;
+        constexpr byte_t _Signature[_Signature_length] = {'U', 'M', 'C', '\0'};
         return _Mystream.write(_Signature, _Signature_length);
     }
 
