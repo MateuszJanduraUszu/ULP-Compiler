@@ -68,7 +68,7 @@ namespace mjx {
     void _Buffered_logger::_Write(const unicode_string_view _Msg) {
         // write message to the log (enqueue to the internal buffer)
         lock_guard _Guard(_Mylock);
-        const thread::id _Id = ::GetCurrentThreadId();
+        const thread::id _Id = ::mjx::current_thread_id();
         const size_t _Idx    = _Find_buffer(_Id);
         if (_Idx != static_cast<size_t>(-1)) { // buffer is registered, use it
             _Mybufs[_Idx]._Queue.push_back(_Msg);
@@ -80,7 +80,7 @@ namespace mjx {
 
     void _Buffered_logger::_Request_flush() noexcept {
         lock_guard _Guard(_Mylock);
-        const size_t _Idx = _Find_buffer(::GetCurrentThreadId());
+        const size_t _Idx = _Find_buffer(::mjx::current_thread_id());
         if (_Idx != static_cast<size_t>(-1)) { // buffer is registered, flush it
             _Flush_buffer(_Idx);
         }
