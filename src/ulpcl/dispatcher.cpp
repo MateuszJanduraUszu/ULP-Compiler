@@ -8,8 +8,6 @@
 #include <ulpcl/dispatcher.hpp>
 #include <ulpcl/program.hpp>
 
-#include <future>
-
 namespace mjx {
     _Dispatcher_base::_Dispatcher_base() noexcept {}
 
