@@ -45,10 +45,9 @@ namespace mjx {
     _Buffered_logger::_Thread_buffer::_Thread_buffer(const thread::id _Id) noexcept
         : _Owner(_Id), _Queue() {}
 
-    size_t _Buffered_logger::_Find_buffer(const thread::id _Id) const noexcept {
-        // assumes that the lock has been acquired
-        for (size_t _Idx = 0; _Idx < _Mybufs.size(); ++_Idx) {
-            if (_Mybufs[_Idx]._Owner == _Id) { // searched buffer found
+    size_t _Buffered_logger::_Find_buffer(vector<_Thread_buffer>& _Bufs, const thread::id _Id) noexcept {
+        for (size_t _Idx = 0; _Idx < _Bufs.size(); ++_Idx) {
+            if (_Bufs[_Idx]._Owner == _Id) { // searched buffer found
                 return _Idx;
             }
         }
@@ -56,34 +55,40 @@ namespace mjx {
         return static_cast<size_t>(-1); // not found
     }
 
-    void _Buffered_logger::_Flush_buffer(const size_t _Idx) noexcept {
-        // assumes that the lock has been acquired and _Idx points to an existing buffer
-        for (const unicode_string& _Msg : _Mybufs[_Idx]._Queue) {
+    void _Buffered_logger::_Flush_buffer(vector<_Thread_buffer>& _Bufs, const size_t _Idx) noexcept {
+        // assumes that _Idx points to an existing buffer
+        for (const unicode_string& _Msg : _Bufs[_Idx]._Queue) {
             _Write_unicode_console(_Msg);
         }
 
-        _Mybufs.erase(_Mybufs.begin() + _Idx); // unregister buffer
+        _Bufs.erase(_Bufs.begin() + _Idx); // unregister buffer
     }
 
     void _Buffered_logger::_Write(const unicode_string_view _Msg) {
         // write message to the log (enqueue to the internal buffer)
-        lock_guard _Guard(_Mylock);
-        const thread::id _Id = ::mjx::current_thread_id();
-        const size_t _Idx    = _Find_buffer(_Id);
-        if (_Idx != static_cast<size_t>(-1)) { // buffer is registered, use it
-            _Mybufs[_Idx]._Queue.push_back(_Msg);
-        } else { // buffer isn't registered, register it now
-            _Mybufs.push_back(_Thread_buffer(_Id));
-            _Mybufs.back()._Queue.push_back(_Msg); // enqueue message
-        }
+        _Mybufs.visit(
+            [_Msg](vector<_Thread_buffer>& _Bufs) {
+                const thread::id _Id = ::mjx::current_thread_id();
+                const size_t _Idx    = _Find_buffer(_Bufs, _Id);
+                if (_Idx != static_cast<size_t>(-1)) { // buffer is already registered, use it
+                    _Bufs[_Idx]._Queue.push_back(_Msg);
+                } else { // buffer is not registered, register it now
+                    _Bufs.push_back(_Thread_buffer(_Id));
+                    _Bufs.back()._Queue.push_back(_Msg); // enqueue message
+                }
+            }
+        );
     }
 
     void _Buffered_logger::_Request_flush() noexcept {
-        lock_guard _Guard(_Mylock);
-        const size_t _Idx = _Find_buffer(::mjx::current_thread_id());
-        if (_Idx != static_cast<size_t>(-1)) { // buffer is registered, flush it
-            _Flush_buffer(_Idx);
-        }
+        _Mybufs.visit(
+            [](vector<_Thread_buffer>& _Bufs) noexcept {
+                const size_t _Idx = _Find_buffer(_Bufs, ::mjx::current_thread_id());
+                if (_Idx != static_cast<size_t>(-1)) { // buffer is registered, flush it
+                    _Flush_buffer(_Bufs, _Idx);
+                }
+            }
+        );
     }
 
     compilation_logger::compilation_logger() noexcept : _Myimpl(nullptr) {}

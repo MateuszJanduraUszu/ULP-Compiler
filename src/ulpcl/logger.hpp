@@ -10,7 +10,7 @@
 #include <mjmem/smart_pointer.hpp>
 #include <mjstr/string.hpp>
 #include <mjstr/string_view.hpp>
-#include <mjsync/srwlock.hpp>
+#include <mjsync/shared_resource.hpp>
 #include <mjsync/thread.hpp>
 #include <ulpcl/utils.hpp>
 
@@ -88,13 +88,12 @@ namespace mjx {
         };
 
         // returns the index of the buffer associated with the specified owner
-        size_t _Find_buffer(const thread::id _Id) const noexcept;
+        static size_t _Find_buffer(vector<_Thread_buffer>& _Bufs, const thread::id _Id) noexcept;
 
         // fluses the specified buffer
-        void _Flush_buffer(const size_t _Idx) noexcept;
+        static void _Flush_buffer(vector<_Thread_buffer>& _Bufs, const size_t _Idx) noexcept;
 
-        mutable shared_lock _Mylock;
-        vector<_Thread_buffer> _Mybufs;
+        shared_resource<vector<_Thread_buffer>> _Mybufs;
     };
 
     class compilation_logger { // logger used at compilation time
