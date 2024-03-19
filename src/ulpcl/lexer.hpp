@@ -108,7 +108,7 @@ namespace mjx {
         void _On_quote();
 
         // handles the occurrence of end of line during lexical analysis
-        void _On_eol();
+        bool _On_eol();
 
         // handles the occurrence of space during lexical analysis
         bool _On_space();
@@ -154,30 +154,35 @@ namespace mjx {
         _Lexer_iterator& _Myiter;
     };
 
+    struct report_counters;
+
     class lexical_analyzer { // breaks an input data into tokens
     public:
-        lexical_analyzer() noexcept;
+        explicit lexical_analyzer(report_counters& _Counters) noexcept;
         ~lexical_analyzer() noexcept;
 
+        lexical_analyzer()                                   = delete;
         lexical_analyzer(const lexical_analyzer&)            = delete;
         lexical_analyzer& operator=(const lexical_analyzer&) = delete;
 
         // analyzes the input data
-        void analyze(const byte_string_view _Input_data);
+        bool analyze(const byte_string_view _Input_data);
+
+        // completes the lexical analysis
+        bool complete_analysis();
 
         // returns the associated token stream
         const token_stream& stream() const noexcept;
 
     private:
         _Lexer_cache _Mycache;
+        report_counters& _Myctrs;
     };
 
     struct analysis_result {
         bool success;
         token_stream stream;
     };
-
-    struct report_counters;
 
     analysis_result analyze_input_file(const path& _Target, report_counters& _Counters);
 } // namespace mjx

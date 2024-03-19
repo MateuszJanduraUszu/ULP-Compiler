@@ -132,16 +132,19 @@ namespace mjx {
         ++_Mycache._Location._Current.column;
     }
 
-    void _Analysis_handler::_On_eol() {
+    bool _Analysis_handler::_On_eol() {
         if (_Mycache._Block == _Analysis_block::_Normal) {
             if (!_Mycache._Buf.empty()) { // append next token to the stream
                 _Flush_buffer();
             }
         } else if (_Mycache._Block == _Analysis_block::_Comment) { // switch to normal block
             _Mycache._Block = _Analysis_block::_Normal;
+        } else { // missing closing bracket detected, break
+            return false;
         }
 
         _Next_line(); // advance to the next line
+        return true;
     }
 
     bool _Analysis_handler::_On_space() {
@@ -231,11 +234,12 @@ namespace mjx {
         ++_Mycache._Location._Current.column;
     }
 
-    lexical_analyzer::lexical_analyzer() noexcept : _Mycache() {}
+    lexical_analyzer::lexical_analyzer(report_counters& _Counters) noexcept
+        : _Mycache(), _Myctrs(_Counters) {}
 
     lexical_analyzer::~lexical_analyzer() noexcept {}
 
-    void lexical_analyzer::analyze(const byte_string_view _Input_data) {
+    bool lexical_analyzer::analyze(const byte_string_view _Input_data) {
         _Lexer_iterator _Iter(_Input_data);
         _Analysis_handler _Handler(_Mycache, _Iter);
         for (; _Iter._Current != _Iter._Last; ++_Iter._Current) {
@@ -244,7 +248,16 @@ namespace mjx {
                 _Handler._On_quote();
                 break;
             case '\n':
-                _Handler._On_eol();
+                if (!_Handler._On_eol()) { // report an error
+                    // Note: The missing quote error is detected only when the current analysis block is
+                    //       a string literal. In such cases, we have captured the location of the current
+                    //       string literal. Therefore, it's preferable to use the captured location
+                    //       instead of the current one, as this provides a more accurate error message.
+                    _Report_error(_Myctrs, L"(%u, %u): error E2016: missing closing quote '\"' for string literal",
+                        _Mycache._Location._Captured.line, _Mycache._Location._Captured.column);
+                    return false;
+                }
+
                 break;
             case ' ':
                 if (_Handler._On_space()) {
@@ -274,7 +287,25 @@ namespace mjx {
                 _Handler._On_char();
                 break;
             }
+
         }
+
+        return true;
+    }
+
+    bool lexical_analyzer::complete_analysis() {
+        // Note: This function is called after lexical analysis, with the main purpose of detecting
+        //       opened string literals. The analyze() function may not detect a missing closing quote
+        //       if the string literal is the last token in the input data, hence it must be checked
+        //       manually. The analysis block after lexical analysis is expected to be either _Normal
+        //       or _Comment, as comments are allowed and completely discarded during analysis.
+        if (_Mycache._Block == _Analysis_block::_String_literal) { // report an error
+            _Report_error(_Myctrs, L"(%u, %u): error E2016: missing closing quote '\"' for string literal",
+                _Mycache._Location._Captured.line, _Mycache._Location._Captured.column);
+            return false;
+        }
+
+        return true;
     }
 
     const token_stream& lexical_analyzer::stream() const noexcept {
@@ -300,7 +331,7 @@ namespace mjx {
             }
         }
 
-        lexical_analyzer _Lexer;
+        lexical_analyzer _Lexer(_Counters);
         bool _Success        = true;
         const float _Elapsed = measure_invoke_duration(
             [&] {
@@ -328,12 +359,19 @@ namespace mjx {
                         default: // detected unsupported BOM, break
                             _Success = false;
                             _Report_error(
-                                _Counters, L"(?, ?): error E1002: detected unsupported BOM (Byte Order Mark)");
+                                _Counters, L"(?, ?): error E1002: detected unsupported encoding");
                             return;
                         }
                     }
 
-                    _Lexer.analyze(byte_string_view{_Buf, _Read});
+                    if (!_Lexer.analyze(byte_string_view{_Buf, _Read})) { // analysis failed, break
+                        _Success = false;
+                        return;
+                    }
+                }
+
+                if (!_Lexer.complete_analysis()) { // analysis completion failed
+                    _Success = false;
                 }
             }
         );
