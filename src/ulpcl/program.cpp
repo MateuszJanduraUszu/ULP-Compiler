@@ -38,6 +38,11 @@ namespace mjx {
         return false; // not included
     }
 
+    path _Absolute_path(const path& _Path) {
+        // concatenate _Path with the current directory if it is relative, otherwise retur it as is
+        return _Path.is_absolute() ? _Path : ::mjx::current_path() / _Path;
+    }
+
     size_t _Clamp_thread_count(size_t _Count) noexcept {
         // clamp _Count to the highest valid value that is not greater than the total number of threads
         const size_t _Max = ::mjx::hardware_concurrency();
@@ -69,7 +74,7 @@ namespace mjx {
 
     void _Options_parser::_Parse_input_file(const unicode_string_view _Value) {
         vector<path>& _Input_files = program_options::current().input_files;
-        path _Path                 = _Value;
+        path _Path                 = _Absolute_path(_Value);
         if (_Is_input_file_included(_Path)) { // already specified
             rtlog(L"Warning: The input file '%s' specified more than once.", _Value.data());
             return;
@@ -90,7 +95,7 @@ namespace mjx {
 
     void _Options_parser::_Parse_input_directory(const unicode_string_view _Value) {
         vector<path>& _Input_files = program_options::current().input_files;
-        const path _Path           = _Value;
+        const path& _Path          = _Absolute_path(_Value);
         if (!::mjx::exists(_Path)) { // specified non-existent directory
             rtlog(L"Warning: The input directory '%s' does not exist, ignored.", _Value.data());
             return;
@@ -116,7 +121,7 @@ namespace mjx {
     void _Options_parser::_Parse_output_directory(const unicode_string_view _Value) {
         path& _Outdir = program_options::current().output_directory;
         if (_Outdir.empty()) { // set the output directory
-            path _Path = _Value;
+            path _Path = _Absolute_path(_Value);
             if (::mjx::exists(_Path)) { // specified existing directory, validate it
                 if (!::mjx::is_directory(_Path)) { // specified non-directory, break
                     rtlog(L"Warning: The output directory '%s' is not a directory, ignored", _Value.data());

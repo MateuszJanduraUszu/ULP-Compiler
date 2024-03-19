@@ -41,6 +41,7 @@ namespace mjx {
     };
 
     bool _Is_input_file_included(const path& _Path) noexcept;
+    path _Absolute_path(const path& _Path);
     size_t _Clamp_thread_count(size_t _Count) noexcept;
     size_t _Choose_thread_count(const size_t _Input_files) noexcept;
 
