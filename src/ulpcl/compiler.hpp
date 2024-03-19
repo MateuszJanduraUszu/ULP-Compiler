@@ -10,6 +10,7 @@
 #include <mjfs/file_stream.hpp>
 #include <mjfs/path.hpp>
 #include <mjstr/string.hpp>
+#include <mjstr/string_view.hpp>
 #include <ulpcl/parser.hpp>
 #include <ulpcl/symbol_file.hpp>
 

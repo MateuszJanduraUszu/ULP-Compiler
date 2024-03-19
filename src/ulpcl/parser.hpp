@@ -8,6 +8,7 @@
 #define _ULPCL_PARSER_HPP_
 #include <cstdint>
 #include <mjstr/string.hpp>
+#include <mjstr/string_view.hpp>
 #include <ulpcl/keyword.hpp>
 #include <ulpcl/lexer.hpp>
 #include <ulpcl/utils.hpp>

@@ -9,7 +9,6 @@
 #include <ulpcl/compiler.hpp>
 #include <ulpcl/lexer.hpp>
 #include <ulpcl/logger.hpp>
-#include <ulpcl/parser.hpp>
 #include <ulpcl/program.hpp>
 #include <ulpcl/runtime.hpp>
 #include <xxhash/xxhash.h>

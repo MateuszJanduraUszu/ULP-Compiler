@@ -12,7 +12,6 @@
 #include <mjmem/smart_pointer.hpp>
 #include <mjsync/thread_pool.hpp>
 #include <mjsync/waitable_event.hpp>
-#include <ulpcl/utils.hpp>
 
 namespace mjx {
     struct compilation_counters {

@@ -5,12 +5,12 @@
 
 #include <cstdio>
 #include <mjfs/status.hpp>
+#include <type_traits>
 #include <ulpcl/logger.hpp>
 #include <ulpcl/program.hpp>
 #include <ulpcl/runtime.hpp>
 #include <ulpcl/symbol_file.hpp>
 #include <ulpcl/version.hpp>
-#include <type_traits>
 
 namespace mjx {
     byte_string _Symbol_serializer::_Serialize_location(const symbol_location _Location) {

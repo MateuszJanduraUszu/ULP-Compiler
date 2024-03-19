@@ -6,9 +6,9 @@
 #include <mjfs/directory.hpp>
 #include <mjfs/status.hpp>
 #include <mjsync/thread.hpp>
+#include <type_traits>
 #include <ulpcl/logger.hpp>
 #include <ulpcl/program.hpp>
-#include <type_traits>
 
 namespace mjx {
     program_options& program_options::current() noexcept {
