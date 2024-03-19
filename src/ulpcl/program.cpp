@@ -39,7 +39,7 @@ namespace mjx {
     }
 
     path _Absolute_path(const path& _Path) {
-        // concatenate _Path with the current directory if it is relative, otherwise retur it as is
+        // concatenate _Path with the current directory if it is relative, otherwise return it as is
         return _Path.is_absolute() ? _Path : ::mjx::current_path() / _Path;
     }
 
