@@ -9,22 +9,11 @@
 #include <cstdint>
 #include <mjfs/file.hpp>
 #include <mjfs/file_stream.hpp>
-#include <mjfs/api.hpp>
 #include <mjstr/string.hpp>
+#include <mjstr/string_view.hpp>
 #include <ulpcl/utils.hpp>
 
 namespace mjx {
-    struct _Local_date {
-        uint8_t _Day;
-        uint8_t _Month;
-        uint16_t _Year;
-    };
-
-    _Local_date _Get_local_date() noexcept;
-    void _Write_day_or_month_to_buffer(byte_t* const _Buf, const uint8_t _Day_or_month) noexcept;
-    void _Write_year_to_buffer(byte_t* const _Buf, const uint16_t _Year) noexcept;
-    byte_string _Get_current_date();
-
     struct symbol_location {
         uint64_t id    = 0; // location of the symbol ID
         uint64_t value = 0; // location of the symbol value

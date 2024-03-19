@@ -65,17 +65,99 @@ namespace mjx {
         clog(_Fmt, _Args...);
     }
 
+    struct _Local_date {
+        uint8_t _Day;
+        uint8_t _Month;
+        uint16_t _Year;
+    };
+
     struct _Local_time {
         uint8_t _Hour;
         uint8_t _Minute;
         uint8_t _Second;
     };
 
+    _Local_date _Get_local_date() noexcept;
     _Local_time _Get_local_time() noexcept;
-    void _Write_time_component_to_buffer(
-        wchar_t* const _Buf, const uint8_t _Component, const bool _Write_colon) noexcept;
-    
-    unicode_string get_current_time();
+
+    template <class _Elem>
+    inline void _Write_day_or_month_and_dot_to_buffer(_Elem* const _Buf, const uint8_t _Day_or_month) noexcept {
+        // assumes that _Buf will fit two digits + dot
+        if (_Day_or_month < 10) { // write one digit, prepend with a zero
+            _Buf[0] = static_cast<_Elem>('0');
+            _Buf[1] = static_cast<_Elem>(_Day_or_month) + '0';
+        } else { // write two digits
+            _Buf[0] = static_cast<_Elem>((_Day_or_month / 10) + '0');
+            _Buf[1] = static_cast<_Elem>((_Day_or_month % 10) + '0');
+        }
+
+        _Buf[2] = static_cast<_Elem>('.'); // write
+    }
+
+    template <class _Elem>
+    inline void _Write_year_to_buffer(_Elem* const _Buf, const uint16_t _Year) noexcept {
+        // assumes that _Buf will fit four digits
+        if (_Year < 10) { // write one digit, prepend with three zeros
+            _Buf[0] = static_cast<_Elem>('0');
+            _Buf[1] = static_cast<_Elem>('0');
+            _Buf[2] = static_cast<_Elem>('0');
+            _Buf[3] = static_cast<_Elem>(_Year + '0');
+        } else if (_Year < 100) { // write two digits, prepend with two zeros
+            _Buf[0] = static_cast<_Elem>('0');
+            _Buf[1] = static_cast<_Elem>('0');
+            _Buf[2] = static_cast<_Elem>(((_Year % 100) / 10) + '0');
+            _Buf[3] = static_cast<_Elem>((_Year % 10) + '0');
+        } else if (_Year < 1000) { // write three digits, prepend with a zero
+            _Buf[0] = static_cast<_Elem>('0');
+            _Buf[1] = static_cast<_Elem>(((_Year % 1000) / 100) + '0');
+            _Buf[2] = static_cast<_Elem>(((_Year % 100) / 10) + '0');
+            _Buf[3] = static_cast<_Elem>((_Year % 10) + '0');
+        } else { // write four digits
+            _Buf[0] = static_cast<_Elem>((_Year / 1000) + '0');
+            _Buf[1] = static_cast<_Elem>(((_Year % 1000) / 100) + '0');
+            _Buf[2] = static_cast<_Elem>(((_Year % 100) / 10) + '0');
+            _Buf[3] = static_cast<_Elem>((_Year % 10) + '0');
+        }
+    }
+
+    template <class _Elem>
+    inline void _Write_time_component_to_buffer(
+        _Elem* const _Buf, const uint8_t _Component, const bool _Write_colon) noexcept {
+        // assumes that _Buf will fit two digits + optionally colon
+        if (_Component < 10) { // write one digit, prepend with a zero
+            _Buf[0] = static_cast<_Elem>('0');
+            _Buf[1] = static_cast<_Elem>(_Component) + '0';
+        } else { // write two digits
+            _Buf[0] = static_cast<_Elem>((_Component / 10) + '0');
+            _Buf[1] = static_cast<_Elem>((_Component % 10) + '0');
+        }
+
+        if (_Write_colon) { // write a colon that will serve as a connector for the two time components
+            _Buf[2] = static_cast<_Elem>(':');
+        }
+    }
+
+    template <class _Elem>
+    inline string<_Elem> get_current_date() {
+        constexpr size_t _Str_size = 10; // always ten characters ('dd.mm.yyyy')
+        _Elem _Buf[_Str_size + 1]  = {_Elem{0}}; // must fit formatted date + null-terminator
+        const _Local_date _Date    = _Get_local_date();
+        _Write_day_or_month_and_dot_to_buffer(_Buf, _Date._Day);
+        _Write_day_or_month_and_dot_to_buffer(_Buf + 3, _Date._Month); // skip 'dd.'
+        _Write_year_to_buffer(_Buf + 6, _Date._Year); // skip 'dd.mm.'
+        return string<_Elem>{_Buf, _Str_size};
+    }
+
+    template <class _Elem>
+    inline string<_Elem> get_current_time() {
+        constexpr size_t _Str_size = 8; // always eight characters ('hh:mm:ss')
+        _Elem _Buf[_Str_size + 1]  = {_Elem{0}}; // must fit formatted time + null-terminator
+        const _Local_time _Time    = _Get_local_time();
+        _Write_time_component_to_buffer(_Buf, _Time._Hour, true);
+        _Write_time_component_to_buffer(_Buf + 3, _Time._Minute, true); // skip 'hh:'
+        _Write_time_component_to_buffer(_Buf + 6, _Time._Second, false); // skip 'hh:mm:'
+        return string<_Elem>{_Buf, _Str_size};
+    }
 } // namespace mjx
 
 #endif // _ULPCL_RUNTIME_HPP_

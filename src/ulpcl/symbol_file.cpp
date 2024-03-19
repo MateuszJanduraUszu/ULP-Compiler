@@ -4,73 +4,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <cstdio>
-#include <mjfs/file.hpp>
-#include <mjfs/file_stream.hpp>
 #include <mjfs/status.hpp>
 #include <ulpcl/logger.hpp>
 #include <ulpcl/program.hpp>
 #include <ulpcl/runtime.hpp>
 #include <ulpcl/symbol_file.hpp>
-#include <ulpcl/tinywin.hpp>
 #include <ulpcl/version.hpp>
 #include <type_traits>
 
 namespace mjx {
-    _Local_date _Get_local_date() noexcept {
-        SYSTEMTIME _Time;
-        ::GetLocalTime(&_Time);
-        return _Local_date{
-            static_cast<uint8_t>(_Time.wDay), static_cast<uint8_t>(_Time.wMonth), _Time.wYear};
-    }
-
-    void _Write_day_or_month_to_buffer(byte_t* const _Buf, const uint8_t _Day_or_month) noexcept {
-        // write _Day_or_month to _Buf and end with a dot, assumes that _Buf will fit three characters
-        if (_Day_or_month < 10) { // write one digit, prepend with a zero
-            _Buf[0] = '0';
-            _Buf[1] = _Day_or_month + '0';
-        } else { // write two digits
-            _Buf[0] = (_Day_or_month / 10) + '0';
-            _Buf[1] = (_Day_or_month % 10) + '0';
-        }
-
-        _Buf[2] = '.'; // write a dot that will connect the two date components
-    }
-
-    void _Write_year_to_buffer(byte_t* const _Buf, const uint16_t _Year) noexcept {
-        // write _Year to _Buf, assumes that _Buf will fit four characters
-        if (_Year < 10) { // write one digit, prepend with three zeros
-            _Buf[0] = '0';
-            _Buf[1] = '0';
-            _Buf[2] = '0';
-            _Buf[3] = static_cast<byte_t>(_Year) + '0';
-        } else if (_Year < 100) { // write two digits, prepend with two zeros
-            _Buf[0] = '0';
-            _Buf[1] = '0';
-            _Buf[2] = static_cast<byte_t>((_Year % 100) / 10) + '0';
-            _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
-        } else if (_Year < 1000) { // write three digits, prepend with a zero
-            _Buf[0] = '0';
-            _Buf[1] = static_cast<byte_t>((_Year % 1000) / 100) + '0';
-            _Buf[2] = static_cast<byte_t>((_Year % 100) / 10) + '0';
-            _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
-        } else { // write four digits
-            _Buf[0] = static_cast<byte_t>(_Year / 1000) + '0';
-            _Buf[1] = static_cast<byte_t>((_Year % 1000) / 100) + '0';
-            _Buf[2] = static_cast<byte_t>((_Year % 100) / 10) + '0';
-            _Buf[3] = static_cast<byte_t>(_Year % 10) + '0';
-        }
-    }
-
-    byte_string _Get_current_date() {
-        constexpr size_t _Str_size = 10; // always ten characters ('dd.mm.yyyy')
-        byte_t _Buf[_Str_size + 1] = {'\0'}; // must fit serialized date + null-terminator
-        const _Local_date _Date    = _Get_local_date();
-        _Write_day_or_month_to_buffer(_Buf, _Date._Day);
-        _Write_day_or_month_to_buffer(_Buf + 3, _Date._Month); // skip 'dd.'
-        _Write_year_to_buffer(_Buf + 6, _Date._Year); // skip 'dd.mm.'
-        return byte_string{_Buf, _Str_size};
-    }
-
     byte_string _Symbol_serializer::_Serialize_location(const symbol_location _Location) {
         // Note: This function converts _Location into '(x, y)', where x and y are always
         //       16 digits in length. The buffer size is calculated as 2 * 16 (two 16-digit values)
@@ -134,7 +76,7 @@ namespace mjx {
         constexpr size_t _Buf_size = 128;
         byte_t _Buf[_Buf_size]     = {'\0'}; // should accommodate every possible comment
         const int _Written         = ::snprintf(reinterpret_cast<char*>(_Buf), // negative value on error
-            _Buf_size, _Fmt, _ULPCL_VERSION, _Get_current_date().c_str());
+            _Buf_size, _Fmt, _ULPCL_VERSION, get_current_date<char>().c_str());
         return _Written > 0 ? _Mystream.write(_Buf, static_cast<size_t>(_Written)) : false;
     }
 

@@ -63,7 +63,7 @@ namespace mjx {
     }
 
     inline void _Print_version() noexcept {
-        rtlog(L"ULPCL version %s compiled on %s", _WIDEN(_ULPCL_VERSION), _WIDEN(_ULPCL_COMPILATION_DATE));
+        rtlog(L"ULPCL version %s compiled on %s", _WIDEN(_ULPCL_VERSION), get_current_date<wchar_t>().c_str());
     }
 
     inline bool _Should_invoke_entry_point(int _Count, wchar_t** _Args) noexcept {
@@ -87,7 +87,7 @@ namespace mjx {
     }
 
     inline void _Start_build() {
-        rtlog(L"Build started at %s...", get_current_time().c_str());
+        rtlog(L"Build started at %s...", get_current_time<wchar_t>().c_str());
         compilation_counters _Counters;
         const float _Elapsed = measure_invoke_duration(
             [&_Counters] {
@@ -102,7 +102,7 @@ namespace mjx {
             }
         );
         rtlog(L"\n----- Build: %zu succeeded, %zu failed", _Counters.succeeded, _Counters.failed);
-        rtlog(L"----- Build completed at %s (took %.5fs)", get_current_time().c_str(), _Elapsed);
+        rtlog(L"----- Build completed at %s (took %.5fs)", get_current_time<wchar_t>().c_str(), _Elapsed);
     }
 
     inline void _Unsafe_entry_point() {
