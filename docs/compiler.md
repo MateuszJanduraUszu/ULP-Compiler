@@ -8,7 +8,7 @@
 
 ## Compiler overview
 
-ulpcl.exe is a command-line tool designed to convert human-readable [ULP](.\ulp.md) files into a binary format representation stored in [UMC](.\umc.md) files. It provides a range of options to customize compiler behavior and manage optional features, offering flexibility and control over the compilation process.
+ulpcl.exe is a command-line tool designed to convert human-readable [ULP](ulp.md) files into a binary format representation stored in [UMC](umc.md) files. It provides a range of options to customize compiler behavior and manage optional features, offering flexibility and control over the compilation process.
 
 ## Compilation steps
 
@@ -27,7 +27,7 @@ flowchart TB
 > The compiler requires files to be encoded as UTF-8. Only UTF-8 BOM or no BOM is accepted.
 > Please ensure compilance to prevent unexpected behavior during compilation.
 
-The compilation process begins by reading the input file containing the message set. Subsequently, the compiler analyzes the input data lexically, breaking it down into tokens like keywords, identifiers, and literals. Following lexical analysis, the compiler parses the token stream to ensure adherence to the syntax rules of the [ULP](.\ulp.md) file format. During this parsing phase, the compiler constructs a parse tree representing the structure of the file's content. Finally, the compiler converts the generated parse tree into binary representation stored in the [UMC](.\umc.md) file. Additionally, depending on the options provided, it may also generate [symbol](.\sym.md) files which store the generated symbols and their locations. 
+The compilation process begins by reading the input file containing the message set. Subsequently, the compiler analyzes the input data lexically, breaking it down into tokens like keywords, identifiers, and literals. Following lexical analysis, the compiler parses the token stream to ensure adherence to the syntax rules of the [ULP](ulp.md) file format. During this parsing phase, the compiler constructs a parse tree representing the structure of the file's content. Finally, the compiler converts the generated parse tree into binary representation stored in the [UMC](umc.md) file. Additionally, depending on the options provided, it may also generate [symbol](sym.md) files which store the generated symbols and their locations. 
 
 ## Compiler options
 
@@ -131,7 +131,7 @@ ulpcl -d
 
 ### `--symbol-file`, `-s`
 
-Specifies whether to generate a [symbol](.\sym.md) file for each input file during compilation. When this option is enabled, the compiler generates a symbol file corresponding to each input file.
+Specifies whether to generate a [symbol](sym.md) file for each input file during compilation. When this option is enabled, the compiler generates a symbol file corresponding to each input file.
 
 ```
 ulpcl --symbol-file
@@ -140,4 +140,4 @@ ulpcl -s
 
 ## Compiler errors and warnings
 
-For a comprehensive list of compiler errors and warnings, please refer to [this](.\cl_err_wrn.md) document.
+For a comprehensive list of compiler errors and warnings, please refer to [this](cl_err_wrn.md) document.

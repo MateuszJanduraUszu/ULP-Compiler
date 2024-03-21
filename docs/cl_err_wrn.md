@@ -22,7 +22,7 @@
 
 * `E1001`: input file 's' is empty
 
-    Occurs when the [error model](.\compiler.md#error-model) is set to strict, and the specified input file is empty.
+    Occurs when the [error model](compiler.md#error-model) is set to strict, and the specified input file is empty.
 
 * `E1002`: detected unsupported encoding
 
