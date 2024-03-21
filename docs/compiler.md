@@ -139,3 +139,5 @@ ulpcl -s
 ```
 
 ## Compiler errors and warnings
+
+For a comprehensive list of compiler errors and warnings, please refer to [this](.\cl_err_wrn.md) document.
