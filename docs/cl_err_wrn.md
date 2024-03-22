@@ -48,7 +48,7 @@
 
     ```
     @language: "Polski"
-    @lcid: "1033"
+    @lcid: "1045"
         @content // missing opening bracket '{' which should be before '@content', E2001 reported
         {
         }
@@ -61,7 +61,7 @@
 
     ```
     @language: "Polski"
-    @lcid: "1033"
+    @lcid: "1045"
     {
         @content
         {
@@ -170,7 +170,7 @@
 
     ```
     @language: "Polski"
-    @lcid: "1033"
+    @lcid: "1045"
     {
         @content
         {
@@ -184,7 +184,7 @@
     Occurs when the message has an empty value and the error model is set to strict.
 
     ```
-    #msg-id: "" // '#msg-id' has empty value, E2014 reported
+    #msg-id: "" // '#msg-id' has an empty value, E2014 reported
     ```
 
 * `E2015`: group 's' has no members
@@ -256,13 +256,35 @@
 
     Occurs when the pack has no messages or groups and the error model is set to soft.
 
+    ```
+    @language: "Polski"
+    @lcid: "1045"
+    {
+        @content
+        {
+            // '@content' has no messages or groups, W2000 reported
+        }
+    }
+    ```
+
 * `W2001`: message 's' has an empty value
 
     Occurs when the message has an empty value and the error model is set to soft.
 
+    ```
+    #msg-id: "" // '#msg-id' has an empty value, W2001 reported
+    ```
+
 * `W2002`: group 's' has no members
 
     Occurs when the group has no members and the error model is set to soft.
+
+    ```
+    @group: "group-name"
+    {
+        // 'group-name' has no members, W2002 reported
+    }
+    ```
 
 ### Symbol file warnings
 
