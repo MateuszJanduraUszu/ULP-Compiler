@@ -265,3 +265,7 @@
     Occurs when the group has no members and the error model is set to soft.
 
 ### Symbol file warnings
+
+* `W4000`: cannot write comment to the symbol file 's'
+
+    Occurs when the compiler is unable to write a comment to the specified symbol file.
