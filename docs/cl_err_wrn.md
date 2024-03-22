@@ -9,7 +9,6 @@
 * [Compiler warnings](#compiler-warnings)
     * [File warnings](#file-warnings)
     * [Lexical analysis/parsing warnings](#lexical-analysisparsing-warnings)
-    * [Compilation warnings](#compilation-warnings)
     * [Symbol file warnings](#symbol-file-warnings)
 
 ## Compiler errors
@@ -247,8 +246,10 @@
 
 ### File warnings
 
-### Lexical analysis/parsing warnings
+* `W1000`: input file 's' is empty
 
-### Compilation warnings
+    Occurs when the error model is set to soft, and the specified input file is empty.
+
+### Lexical analysis/parsing warnings
 
 ### Symbol file warnings
