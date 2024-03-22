@@ -248,8 +248,20 @@
 
 * `W1000`: input file 's' is empty
 
-    Occurs when the error model is set to soft, and the specified input file is empty.
+    Occurs when the error model is set to soft and the specified input file is empty.
 
 ### Lexical analysis/parsing warnings
+
+* `W2000`: pack 's' has no messages or groups
+
+    Occurs when the pack has no messages or groups and the error model is set to soft.
+
+* `W2001`: message 's' has an empty value
+
+    Occurs when the message has an empty value and the error model is set to soft.
+
+* `W2002`: group 's' has no members
+
+    Occurs when the group has no members and the error model is set to soft.
 
 ### Symbol file warnings
