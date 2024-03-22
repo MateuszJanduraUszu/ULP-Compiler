@@ -22,7 +22,7 @@
 
 * `E1001`: input file 's' is empty
 
-    Occurs when the [error model](compiler.md#error-model) is set to strict, and the specified input file is empty.
+    Occurs when the error model is set to strict, and the specified input file is empty.
 
 * `E1002`: detected unsupported encoding
 
@@ -31,6 +31,8 @@
 ### Lexical analysis/parsing errors
 
 * `E2000`: undefined symbol 's' which is required
+
+    Occurs when a required symbol, such as `@language`, `@lcid`, or `@content`, is not undefined within the input file.
 
     ```
     @language: "Polski"
@@ -43,6 +45,8 @@
 
 * `E2001`: missing opening bracket '{' for the global section
 
+    Occurs when the opening bracket '{' is not specified for the global section.
+
     ```
     @language: "Polski"
     @lcid: "1033"
@@ -53,6 +57,8 @@
     ```
 
 * `E2002`: missing closing bracket '}' for the global section
+
+    Occurs when the closing bracket '}' is not specified for the global section.
 
     ```
     @language: "Polski"
@@ -66,6 +72,8 @@
 
 * `E2003`: missing opening bracket '{' for group 's'
 
+    Occurs when the opening bracket '{' is not specified for the group.
+
     ```
     @group: "group-name"
         #msg-id: "msg-value" // missing opending bracket '{' which should be before '#msg-id', E2003 reported 
@@ -73,6 +81,8 @@
     ```
 
 * `E2004`: missing closing bracket '}' for group 's'
+
+    Occurs when the closing bracket '}' is not specified for the group.
 
     ```
     @group: "group-name"
@@ -83,11 +93,15 @@
 
 * `E2005`: incomplete message 's'
 
+    Occurs when the message is incomplete, i.e., some token is missing or tokens are in the wrong order.
+
     ```
     #msg-id // missing colon ':' and string literal '""' which are required for messages, E2005 reported
     ```
 
 * `E2006`: invalid usage of the 's' keyword
+
+    Occurs when the keyword was used incorrectly, i.e., some token is missing or tokens are in the wrong order.
 
     ```
     @group // missing colon ':' and opening bracket '{' which are required for 'group' keyword, E2006 reported
@@ -96,6 +110,8 @@
     ```
 
 * `E2007`: ambiguous group name, 's' is already defined
+
+    Occurs when the group is already defined in the current scope.
 
     ```
     @group: "parent-group-name"
@@ -110,6 +126,8 @@
 
 * `E2008`: ambiguous identifier name, 's' is already defined
 
+    Occurs when the identifier is already defined in the current scope.
+
     ```
     #msg-id: "msg-value"
     #msg-id: "other-msg-value" // '#msg-id' is already defined, E2008 reported
@@ -117,11 +135,15 @@
 
 * `E2009`: illegal group name 's'
 
+    Occurs when the group name is illegal, i.e., contains forbidden characters or has the wrong format.
+
     ```
     #Идентификатор-сообщения: "msg-value" // 'Идентификатор-сообщения' is not a legal name, E2009 reported
     ```
 
 * `E2010`: illegal identifier name 's'
+
+    Occurs when the identifier name is illegal, i.e., contains forbidden characters or has the wrong format.
 
     ```
     #訊息ID: "msg-value" // '訊息ID' is not a legal name, E2010 reported
@@ -129,17 +151,23 @@
 
 * `E2011`: invalid '@lcid' value
 
+    Occurs when the value specified in `@lcid` is invalid, i.e., contains non-digits.
+
     ```
     @lcid: "MY_LCID" // 'MY_LCID' is not a decimal number, E2011 reported
     ```
 
 * `E2012`: unexpected token 's'
 
+    Occurs when the token is unexpected in the current context.
+
     ```
     #msg-id: "msg-value" {} // brackets are unexpected here, E2012 reported
     ```
 
 * `E2013`: pack 's' has no messages or groups
+
+    Occurs when the pack has no messages or groups and the error model is set to strict.
 
     ```
     @language: "Polski"
@@ -154,11 +182,15 @@
 
 * `E2014`: message 's' has an empty value
 
+    Occurs when the message has an empty value and the error model is set to strict.
+
     ```
     #msg-id: "" // '#msg-id' has empty value, E2014 reported
     ```
 
 * `E2015`: group 's' has no members
+
+    Occurs when the group has no members and the error model is set to strict.
 
     ```
     @group: "group-name"
@@ -168,6 +200,8 @@
     ```
 
 * `E2016`: missing closing quote '"' for string literal
+
+    Occurs when the string literal has no closing quote.
 
     ```
     #msg-id: "msg-value // missing closing quote '}', E2016 reported
