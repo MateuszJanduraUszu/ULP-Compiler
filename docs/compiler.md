@@ -12,7 +12,7 @@ ulpcl.exe is a command-line tool designed to convert human-readable [ULP](ulp.md
 
 ## Compilation steps
 
-The following diagram shows how compilation steps:
+The following diagram shows compilation steps:
 
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
@@ -23,7 +23,7 @@ flowchart TB
     end
 ```
 
-> **Note**
+> **Note** <br>
 > The compiler requires files to be encoded as UTF-8. Only UTF-8 BOM or no BOM is accepted.
 > Please ensure compilance to prevent unexpected behavior during compilation.
 
