@@ -209,6 +209,26 @@
 
 ### Compilation errors
 
+* `E3000`: cannot create the UMC file 's'
+
+    Occurs when the compiler is unable to create the specified UMC file.
+
+* `E3001`: cannot open the UMC file 's'
+
+    Occurs when the compiler is unable to open the specified UMC file for overwrite.
+
+* `E3002`: cannot generate the UMC file header
+
+    Occurs when the compiler is unable to generate a header for the specified UMC file.
+
+* `E3003`: cannot generate the UMC file lookup table
+
+    Occurs when the compiler is unable to generate a lookup table for the specified UMC file.
+
+* `E3004`: cannot generate the UMC file blob
+
+    Occurs when the compiler is unable to generate a blob for the specified UMC file.
+
 ### Symbol file errors
 
 ## Compiler warnings
