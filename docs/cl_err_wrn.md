@@ -231,6 +231,18 @@
 
 ### Symbol file errors
 
+* `E4000`: cannot create the symbol file 's'
+
+    Occurs when the compiler is unable to create the specified symbol file.
+
+* `E4001`: cannot open the symbol file 's'
+
+    Occurs when the compiler is unable to create the specified symbol file for overwrite.
+
+* `E4002`: cannot write symbol to the symbol file 's'
+
+    Occurs when the compiler is unable to write a symbol to the specified symbol file.
+
 ## Compiler warnings
 
 ### File warnings
