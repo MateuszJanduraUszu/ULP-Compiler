@@ -1,4 +1,4 @@
-# ULPCL (ULP Compiler)
+# ULP Compiler (ULPCL)
 
 ## In this document
 * [Compiler overview](#compiler-overview)
