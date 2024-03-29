@@ -74,7 +74,7 @@ namespace mjx {
     compilation_dispatcher::~compilation_dispatcher() noexcept {}
 
     _Dispatcher_base* compilation_dispatcher::_Create() {
-        if (program_options::current().threads > 0) { // create parallel dispatcher
+        if (program_options::current().threads > 1) { // create parallel dispatcher
             return ::mjx::create_object<_Parallel_dispatcher>();
         } else { // create sequential dispatcher
             return ::mjx::create_object<_Sequential_dispatcher>();
